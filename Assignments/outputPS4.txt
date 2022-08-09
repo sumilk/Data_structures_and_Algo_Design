@@ -1,0 +1,4 @@
+Shortest route from the Hospital A (Node A) to reach the Hospital B (Node H) is
+[A-C-E-G-F-H]
+and it has minimum travel distance 11km
+it will take 8:5 minutes for the ambulance to reach the Hospital B at a speed of 80 kmph.

@@ -1,0 +1,17 @@
+A /B / 8
+A / C / 2
+A / D / 5
+B/F/11
+B/D/2
+C/D/2
+C/E/3
+D/E/1
+D/F/6
+D/G/3
+E/G/1
+F/G/2
+F/H/3
+G/H/6
+Hospital A Node: A
+Hospital B Node: H
+Ambulance Speed: 80
