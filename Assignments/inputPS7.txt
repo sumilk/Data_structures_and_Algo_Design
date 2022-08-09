@@ -1,0 +1,3 @@
+Products: A / B / C / D / E / F
+Staging: 20 / 30 / 45 / 60 / 20 / 10
+Photo: 30 / 30 / 15 / 20 / 40 / 60
