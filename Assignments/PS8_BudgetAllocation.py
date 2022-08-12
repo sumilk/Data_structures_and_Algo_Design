@@ -95,9 +95,9 @@ if __name__ == "__main__":
     missions, budget_remaining = ba.get_missions(available_budget, final_budget, budget_list, value_list, n_missions)
 
     with open('outputPS8.txt', 'w') as output_file:
-        output_file.write("The missions that should be funded: " + str(missions) + "\n")
+        output_file.write(f'The missions that should be funded: {str(missions)}\n')
 
-        output_file.write("Total value: " + str(t[n_missions][available_budget]) + "\n")
+        output_file.write(f'Total value: {t[n_missions][available_budget]}\n')
 
-        output_file.write("Budget remaining: " + str(budget_remaining))
+        output_file.write(f'Budget remaining: {budget_remaining}')
 
