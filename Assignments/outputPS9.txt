@@ -1,0 +1,8 @@
+Total Damage: 157.5
+Ammunition Packs Selection Ratio::
+A1: 1
+A2: 1
+A3: 1
+A4: 0.38
+A5: 1
+A6: 1
