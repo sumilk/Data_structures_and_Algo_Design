@@ -13,8 +13,7 @@ class RichCommunity:
             max_wealth += wealth_list[max_index] * community_size + self.find_max_wealth(community_size,
                                                                                     wealth_list[:-community_size])
         else:
-            len_left = community_size // 2
-
+            
             max_wealth += wealth_list[max_index] * community_size + \
                           self.find_max_wealth(community_size,
                                                wealth_list[:max_index - community_size // 2] + wealth_list[
