@@ -20,7 +20,7 @@ class ProductPhotoshoot:
             total_staging_time += item[0]
             if total_staging_time > total_photo_time:
                 total_idle_time += total_staging_time - total_photo_time
-                total_photo_time += total_idle_time
+                total_photo_time += total_staging_time - total_photo_time
             total_photo_time += item[1]
 
         return product_sequence, total_photo_time, total_idle_time
