@@ -6,7 +6,8 @@ import operator
 VALID_CR_STRAT_TYPES = [
     'linear_probing',
     'quadratic_probing',
-    'double_hashing'
+    'double_hashing',
+    'separate_chaining'
 
 ]
 
@@ -15,7 +16,7 @@ ops = {
     '+' : operator.add,
     '-' : operator.sub,
     '*' : operator.mul,
-    '/' : operator.truediv,  
+    '/' : operator.truediv,  # use operator.div for Python 2
     'mod' : operator.mod,
     '^' : operator.xor,
 }
@@ -45,6 +46,60 @@ class CollosionResolution(ABC):
     def probe(self, **kwargs):
         pass
 
+class SeparateChaining(CollosionResolution):
+
+    def get_strategy_type(self):
+        return 'separate_chaining'
+
+    h_k = lambda self, k: k % self.N
+
+    # def __init__(self, **kwargs):
+    #     self.input_seq = kwargs.get('input_seq')
+    #     self.N = kwargs.get('N')
+    #     self.hash_array = np.empty(N)
+    #     self._prepare_probe_table()
+
+    def _prepare_data(self,**kwargs):
+
+        self.input_seq = kwargs.get('input_seq')
+        self.N = kwargs.get('N')
+        self.hash_table = {i:[] for i in range(self.N)}
+
+
+        self.hash_func = f'h(k) = k mod {self.N}'
+
+
+        #self.lp_df.index = lp_df['k']
+        #self.lp_df.drop(columns='k', inplace=True)
+
+
+    def probe(self, **kwargs):
+        self._prepare_data(**kwargs)
+        print('Initiating separate chaining')
+        print(f'\nInput Sequence: \n{self.input_seq}\n')
+        print(self.hash_func)
+
+        for s in self.input_seq:
+            print(f'\nKey: {s}')
+            print(f'Hash value h(k) = {s} mod {self.N} = {self.h_k(s)}')
+            print(f'Inserted at {self.h_k(s)}')
+            self.hash_table[self.h_k(s)].append(s)
+
+
+
+
+        print(f'\nFinal Hash Table: \n')
+        self.print_table()
+
+    def print_table(self):
+        for key in self.hash_table.keys():
+            if len(self.hash_table[key])==0:
+                print(key)
+            else:
+                vals = [str(v) for v in self.hash_table[key]]
+                print(f"{key}-->{'--'.join(vals)}")
+
+
 
 class LinearProbing(CollosionResolution):
 
@@ -70,6 +125,7 @@ class LinearProbing(CollosionResolution):
         self.lp_df = pd.DataFrame(columns=['k', self.hash_func, 'Probes'])
         self.lp_df['k'] = self.input_seq
         self.lp_df[self.hash_func] = self.lp_df['k'].apply(self.h_k)
+        self.collisions = []
         #self.lp_df.index = lp_df['k']
         #self.lp_df.drop(columns='k', inplace=True)
 
@@ -86,6 +142,8 @@ class LinearProbing(CollosionResolution):
 
         print(f'\nFinal Probe Table: \n{self.lp_df}')
         print(f'\nFinal Hash Table: \n{self.hash_array}')
+        str_colls = [str(x) for x in self.collisions]
+        print(f"\nTotal collisions: {'+'.join(str_colls)} = {sum(self.collisions)}")
 
     def _probe_and_insert(self, x):
         probes = ''
@@ -93,6 +151,7 @@ class LinearProbing(CollosionResolution):
         print(f'\nh(k): {x[self.hash_func]}')
         print(f'Hash Table before insertion: \n{self.hash_array}\n')
         inserted = False
+        colls = 0
         for i in range(self.N):
             print(f'For i = {i}')
 
@@ -109,9 +168,13 @@ class LinearProbing(CollosionResolution):
                 break
             else:
                 print(probe_index_str, ' - Occupied')
+                colls +=1
         if not inserted:
             k = x['k']
             print(f'\nk = {k} could not be inserted after {self.N} probes')
+
+        print(f'Collisions : {colls}')
+        self.collisions.append(colls)
         return probes
 
 class QuadraticProbing(CollosionResolution):
@@ -134,6 +197,7 @@ class QuadraticProbing(CollosionResolution):
         self.hash_array = [None] * self.N
 
         self.hash_func = f'h(k) = k mod {self.N}'
+        self.collisions = []
 
         self.lp_df = pd.DataFrame(columns=['k', self.hash_func, 'Probes'])
         self.lp_df['k'] = self.input_seq
@@ -154,6 +218,8 @@ class QuadraticProbing(CollosionResolution):
 
         print(f'\nFinal Probe Table: \n{self.lp_df}')
         print(f'\nFinal Hash Table: \n{self.hash_array}')
+        str_colls = [str(x) for x in self.collisions]
+        print(f"\nTotal collisions: {'+'.join(str_colls)} = {sum(self.collisions)}")
 
     def _probe_and_insert(self, x):
         probes = ''
@@ -161,6 +227,7 @@ class QuadraticProbing(CollosionResolution):
         print(f'\nh(k): {x[self.hash_func]}')
         print(f'Hash Table before insertion: \n{self.hash_array}\n')
         inserted = False
+        colls = 0
         for i in range(self.N):
             print(f'For i = {i}')
 
@@ -177,9 +244,13 @@ class QuadraticProbing(CollosionResolution):
                 break
             else:
                 print(probe_index_str, ' - Occupied')
+                colls += 1
         if not inserted:
             k = x['k']
             print(f'\nk = {k} could not be inserted after {self.N} probes')
+
+        print(f'Collisions : {colls}')
+        self.collisions.append(colls)
         return probes
 
 class DoubleHashing(CollosionResolution):
@@ -200,6 +271,8 @@ class DoubleHashing(CollosionResolution):
         self.input_seq = kwargs.get('input_seq')
         self.N = kwargs.get('N')
         self.hash_array = [None] * self.N
+
+        self.collisions = []
 
         d_K_str = kwargs.get('d_k')
         d_k = d_K_str.split()
@@ -234,6 +307,8 @@ class DoubleHashing(CollosionResolution):
         self.lp_df['Probes'] = self.lp_df.apply(self._probe_and_insert, axis=1)
         print(f'\nFinal Probe Table: \n{self.lp_df}')
         print(f'\nFinal Hash Table: \n{self.hash_array}')
+        str_colls = [str(x) for x in self.collisions]
+        print(f"\nTotal collisions: {'+'.join(str_colls)} = {sum(self.collisions)}")
 
     def _probe_and_insert(self, x):
         probes = ''
@@ -242,6 +317,7 @@ class DoubleHashing(CollosionResolution):
         print(f'd(k): {x[self.d_k_func]}')
         print(f'Hash Table before insertion: \n{self.hash_array}\n')
         inserted = False
+        colls = 0
         for i in range(self.N):
             print(f'For i = {i}')
             probe_index = (x[self.hash_func] + i*x[self.d_k_func]) % self.N
@@ -258,9 +334,13 @@ class DoubleHashing(CollosionResolution):
                 break
             else:
                 print(probe_index_str, ' - Occupied')
+                colls += 1
         if not inserted:
             k = x['k']
             print(f'\nk = {k} could not be inserted after {self.N} probes')
+
+        print(f'Collisions : {colls}')
+        self.collisions.append(colls)
         return probes
 
 
@@ -268,5 +348,5 @@ class DoubleHashing(CollosionResolution):
 if __name__ == '__main__':
     crf = CollisionResolutionFactory()
     # crf.get_strategy(strategy_type='quadratic_probing').probe(input_seq = [1, 22, 34, 47, 31, 57, 83, 14, 5], d_k = '1 + k mod 9', N = 11)
-    crf.get_strategy(strategy_type='double_hashing').probe(input_seq=[16, 7, 28, 31, 67, 28, 29, 73, 99, 43, 218],
-                                                           d_k='7 - k mod 7', N=15)
+    crf.get_strategy(strategy_type='quadratic_probing').probe(input_seq=[31, 45, 15, 99, 11, 5, 47, 4, 11, 28],
+                                                           d_k='1 + k mod 9', N=11)
